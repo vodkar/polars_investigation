@@ -1,0 +1,29 @@
+[tool.poetry]
+name = "polars-investigation"
+version = "0.1.0"
+description = ""
+authors = ["vodkar <boombarah@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+polars = "^0.20.29"
+pandas = "^2.2.2"
+ipykernel = "^6.29.4"
+kaggle = "^1.6.14"
+pyarrow = "^16.1.0"
+pyspark = "^3.5.1"
+dask = { extras = ["dataframe", "distributed"], version = "^2024.5.1" }
+modin = { extras = ["all"], version = "^0.30.0" }
+duckdb = "^0.10.3"
+faker = "^25.3.0"
+pydantic = "^2.7.2"
+pytest = "^8.2.1"
+memray = "^1.12.0"
+matplotlib = "^3.9.0"
+seaborn = "^0.13.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
