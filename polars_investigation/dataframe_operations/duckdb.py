@@ -20,12 +20,7 @@ class DuckDBDataFrameOperations(BaseDataFrameOperations[duckdb.DuckDBPyRelation]
         con = duckdb.connect(database=":memory:")
         con.sql(f"SET threads TO {cpu_count};")
         # Warming up
-        con.read_parquet(
-            str(
-                Path(__file__).parent
-                / "flight_parquet/part-00000-aefaf364-d401-4e57-92a5-82fae6fdc855-c000.snappy.parquet"
-            )
-        ).execute()
+        con.read_parquet("datasets/users.parquet").execute()
 
         yield cls(con)
 
@@ -51,9 +46,9 @@ class DuckDBDataFrameOperations(BaseDataFrameOperations[duckdb.DuckDBPyRelation]
         train_data, users_session_data, users_data = dataframes
         train_data = train_data.set_alias("train_data")
         users_session_data = users_session_data.set_alias("users_session_data")
-        users_data = users_data.set_alias("users_data")
+        # users_data = users_data.set_alias("users_data")
         columns_to_select = set(
-            [*train_data.columns, *users_session_data.columns, *users_data.columns]
+            [*train_data.columns, *users_session_data.columns]
         ) - {"session_id", "id"}
         return (
             train_data.join(

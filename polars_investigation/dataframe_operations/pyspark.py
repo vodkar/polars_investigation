@@ -29,7 +29,7 @@ class PysparkDataFrameOperations(BaseDataFrameOperations[DataFrame]):
             .getOrCreate()
         )
         # Warming up the JVM
-        spark.read.parquet(str(Path(__file__).parent / "flight_parquet")).count()
+        spark.read.parquet("datasets/users.parquet").count()
 
         yield cls(spark)
 
