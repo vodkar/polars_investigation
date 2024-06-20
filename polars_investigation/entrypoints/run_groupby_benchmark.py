@@ -20,10 +20,10 @@ def group(
                 dataframe_operations.prepare_datasets(DATASETS_PATH / dataset_size)[0],
             ),
             "group",
-            f"{dataframe_operations.provider_name}-group",
+            dataframe_operations.provider_name,
             cpu_count,
             dataset_size,
-                        spark_get_memory=getattr(dataframe_operations, "memory_consumption", None),
+            spark_get_memory=getattr(dataframe_operations, "memory_consumption", None),
         )
 
 
@@ -33,5 +33,3 @@ def run():
 
 if __name__ == "__main__":
     run()
-
-

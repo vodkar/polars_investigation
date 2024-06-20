@@ -20,7 +20,7 @@ def is_in(
                 dataframe_operations.prepare_datasets(DATASETS_PATH / dataset_size)[0],
             ),
             "is_in",
-            f"{dataframe_operations.provider_name}-is_in",
+            dataframe_operations.provider_name,
             cpu_count,
             dataset_size,
             spark_get_memory=getattr(dataframe_operations, "memory_consumption", None),

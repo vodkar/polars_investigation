@@ -48,8 +48,7 @@ class PandasDataFrameOperations(BaseDataFrameOperations[pd.DataFrame]):
         return (
             train_data.merge(
                 users_session_data, left_on="session", right_on="session_id", how="left"
-            )
-            .drop(columns="session_id")
+            ).drop(columns="session_id")
             # .merge(users_data, left_on="user_id", right_on="id")
             # .drop(columns="id")
         )
@@ -61,7 +60,7 @@ class PandasDataFrameOperations(BaseDataFrameOperations[pd.DataFrame]):
         return (
             pd.read_parquet(dataset_path / TRAIN_PARQUET_NAME),
             pd.read_parquet(USERS_SESSION_PARQUET),
-            pd.read_parquet(USERS_PARQUET),
+            pd.read_parquet(dataset_path / USERS_PARQUET),
         )
 
     @staticmethod

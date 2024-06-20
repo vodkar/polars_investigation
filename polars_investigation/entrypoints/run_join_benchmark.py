@@ -20,7 +20,7 @@ def join(
                 dataframe_operations.prepare_datasets(DATASETS_PATH / dataset_size),
             ),
             "join",
-            f"{dataframe_operations.provider_name}-join",
+            dataframe_operations.provider_name,
             cpu_count,
             dataset_size,
             spark_get_memory=getattr(dataframe_operations, "memory_consumption", None),

@@ -47,9 +47,10 @@ class DuckDBDataFrameOperations(BaseDataFrameOperations[duckdb.DuckDBPyRelation]
         train_data = train_data.set_alias("train_data")
         users_session_data = users_session_data.set_alias("users_session_data")
         # users_data = users_data.set_alias("users_data")
-        columns_to_select = set(
-            [*train_data.columns, *users_session_data.columns]
-        ) - {"session_id", "id"}
+        columns_to_select = set([*train_data.columns, *users_session_data.columns]) - {
+            "session_id",
+            "id",
+        }
         return (
             train_data.join(
                 users_session_data,
@@ -57,8 +58,7 @@ class DuckDBDataFrameOperations(BaseDataFrameOperations[duckdb.DuckDBPyRelation]
                 how="left",
             )
             # .join(users_data, "users_session_data.user_id = users_data.id")
-            .select(*columns_to_select)
-            .execute()
+            .select(*columns_to_select).execute()
         )
 
     def read_parquet(self, parquet: Path) -> list[Any]:
@@ -68,9 +68,11 @@ class DuckDBDataFrameOperations(BaseDataFrameOperations[duckdb.DuckDBPyRelation]
         self, dataset_path: Path
     ) -> DataFrames[duckdb.DuckDBPyRelation]:
         return (
-            self.connection.read_parquet(str(dataset_path / TRAIN_PARQUET_NAME)),
-            self.connection.read_parquet(str(USERS_SESSION_PARQUET)),
-            self.connection.read_parquet(str(USERS_PARQUET)),
+            self.connection.read_parquet(
+                str(dataset_path / TRAIN_PARQUET_NAME)
+            ).execute(),
+            self.connection.read_parquet(str(USERS_SESSION_PARQUET)).execute(),
+            self.connection.read_parquet(str(dataset_path / USERS_PARQUET)).execute(),
         )
 
     @staticmethod

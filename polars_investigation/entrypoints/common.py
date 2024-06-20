@@ -15,8 +15,8 @@ from dataframe_operations.pyspark import PysparkDataFrameOperations
 from paths import DATASET_SIZES
 
 OPERATION_TYPES = [
-   PandasDataFrameOperations,
-   DaskDataFrameOperations,
+    PandasDataFrameOperations,
+    DaskDataFrameOperations,
     PolarsDataFrameOperations,
     DuckDBDataFrameOperations,
     ModinDataFrameOperations,
@@ -30,7 +30,7 @@ def benchmark_loop(func, csv_name: str):
     for operations_type in OPERATION_TYPES:
         for size in DATASET_SIZES:
             benchmarks: list[BenchmarkResult] = []
-            for cpu_count in [int(os.cpu_count())]:
+            for cpu_count in [1, int(os.cpu_count())]:
                 results = repeatably_run_in_process(
                     func, REPEAT_N_TIMES, operations_type, cpu_count, size
                 )

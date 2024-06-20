@@ -75,9 +75,9 @@ class PolarsDataFrameOperations(BaseDataFrameOperations[pl.DataFrame]):
 
     def prepare_datasets(self, dataset_path: Path) -> DataFrames[pl.LazyFrame]:
         return (
-            pl.scan_parquet(dataset_path / TRAIN_PARQUET_NAME, low_memory=True),
-            pl.scan_parquet(USERS_SESSION_PARQUET, low_memory=True),
-            pl.scan_parquet(USERS_PARQUET, low_memory=True),
+            pl.scan_parquet(dataset_path / TRAIN_PARQUET_NAME),
+            pl.scan_parquet(USERS_SESSION_PARQUET),
+            pl.scan_parquet(dataset_path / USERS_PARQUET),
         )
 
     @staticmethod

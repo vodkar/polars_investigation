@@ -1,6 +1,6 @@
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Any, Generator, Self
+from typing import Generator, Self
 
 import pandas as pd
 import pyspark.sql.functions as f
@@ -81,8 +81,7 @@ class PysparkDataFrameOperations(BaseDataFrameOperations[DataFrame]):
                 users_session_data,
                 train_data.session == users_session_data.session_id,
                 how="left",
-            )
-            .drop("session_id")
+            ).drop("session_id")
             # .join(users_data, users_session_data.user_id == users_data.id)
             # .drop("id")
         )
@@ -102,7 +101,7 @@ class PysparkDataFrameOperations(BaseDataFrameOperations[DataFrame]):
         dfs = (
             self.spark.read.parquet(str(dataset_path / TRAIN_PARQUET_NAME)),
             self.spark.read.parquet(str(USERS_SESSION_PARQUET)),
-            self.spark.read.parquet(str(USERS_PARQUET)),
+            self.spark.read.parquet(str(dataset_path / USERS_PARQUET)),
         )
         return dfs
 

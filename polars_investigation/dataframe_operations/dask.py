@@ -72,9 +72,9 @@ class DaskDataFrameOperations(BaseDataFrameOperations[Any]):
 
     def prepare_datasets(self, dataset_path: Path) -> DataFrames[pd.DataFrame]:
         return (
-            dd.read_parquet(dataset_path / TRAIN_PARQUET_NAME).persist(),
-            dd.read_parquet(USERS_SESSION_PARQUET).persist(),
-            dd.read_parquet(USERS_PARQUET).persist(),
+            dd.read_parquet(dataset_path / TRAIN_PARQUET_NAME).compute(),
+            dd.read_parquet(USERS_SESSION_PARQUET).compute(),
+            dd.read_parquet(dataset_path / USERS_PARQUET).compute(),
         )
 
     @staticmethod

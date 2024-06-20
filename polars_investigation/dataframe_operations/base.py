@@ -117,7 +117,7 @@ def benchmark(
     memory_before = memory_consumption_in_bytes()
     start = monotonic()
     func()
-    read_parquet_time = monotonic() - start
+    duration = monotonic() - start
     if "modin" in tool:
         memray_result_json = MEMRAY_TRACK_FILE.with_suffix(".json")
         subprocess.run(
@@ -136,7 +136,10 @@ def benchmark(
         MEMRAY_TRACK_FILE.unlink()
         memray_result_json.unlink()
     elif "pyspark" in tool:
-        memory_in_bytes = spark_get_memory()
+        if spark_get_memory:
+            memory_in_bytes = spark_get_memory()
+        else:
+            raise ValueError("`spark_get_memory` parameter func is not defined for pyspark run")
     else:
         memory_in_bytes = memory_consumption_in_bytes() - memory_before
 
@@ -144,29 +147,12 @@ def benchmark(
         name=name,
         tool=tool,
         cpu_count=cpu_count,
-        time_in_seconds=read_parquet_time,
+        time_in_seconds=duration,
         memory_in_bytes=memory_in_bytes,
         dataset_size=dataset_size,
     )
 
 
-def read_parquet_benchmark(
-    dataframe_type: Type[BaseDataFrameOperations[T]],
-    cpu_count: int,
-    dataset_size: str,
-) -> BenchmarkResult:
-    with dataframe_type.setup(cpu_count) as dataframe_operations:
-        return benchmark(
-            partial(
-                dataframe_operations.read_parquet,
-                DATASETS_PATH / dataset_size / TRAIN_PARQUET_NAME,
-            ),
-            "read_parquet",
-            f"{dataframe_operations.provider_name}-read_parquet",
-            cpu_count,
-            dataset_size,
-            spark_get_memory=getattr(dataframe_operations, "memory_consumption", None),
-        )
 
 
 def benchmarks_to_csv(benchmarks: list[BenchmarkResult], filename: Path) -> None:
