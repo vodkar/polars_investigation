@@ -34,7 +34,7 @@ class DaskDataFrameOperations(BaseDataFrameOperations[Any]):
             # & users_df["cards"].apply(
             #     lambda cards: any(card["provider"] == "Mastercard" for card in cards)
             # )
-        ].compute()
+        ]
 
     def group(self, train_df: Any) -> pd.DataFrame:
         return (
@@ -60,8 +60,7 @@ class DaskDataFrameOperations(BaseDataFrameOperations[Any]):
         return (
             train_data.merge(
                 users_session_data, left_on="session", right_on="session_id", how="left"
-            )
-            .drop(columns="session_id")
+            ).drop(columns="session_id")
             # .merge(users_data, left_on="user_id", right_on="id")
             # .drop(columns="id")
             .compute()
