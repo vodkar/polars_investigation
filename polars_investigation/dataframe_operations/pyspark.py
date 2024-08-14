@@ -103,6 +103,10 @@ class PysparkDataFrameOperations(BaseDataFrameOperations[DataFrame]):
             self.spark.read.parquet(str(USERS_SESSION_PARQUET)),
             self.spark.read.parquet(str(dataset_path / USERS_PARQUET)),
         )
+        dfs[0].count()
+        dfs[1].count()
+        dfs[2].count()
+
         return dfs
 
     @staticmethod

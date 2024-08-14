@@ -139,7 +139,9 @@ def benchmark(
         if spark_get_memory:
             memory_in_bytes = spark_get_memory()
         else:
-            raise ValueError("`spark_get_memory` parameter func is not defined for pyspark run")
+            raise ValueError(
+                "`spark_get_memory` parameter func is not defined for pyspark run"
+            )
     else:
         memory_in_bytes = memory_consumption_in_bytes() - memory_before
 
@@ -151,8 +153,6 @@ def benchmark(
         memory_in_bytes=memory_in_bytes,
         dataset_size=dataset_size,
     )
-
-
 
 
 def benchmarks_to_csv(benchmarks: list[BenchmarkResult], filename: Path) -> None:
@@ -181,14 +181,16 @@ def repeatably_run_in_process(
             print(
                 f"Runs {pass_number + 1}/{repeat} pass with {dataframe_type} benchmark. cpu_count={cpu_count} | dataset_size={dataset_size}"
             )
-            future = pool.submit(func, dataframe_type, cpu_count, dataset_size, **kwargs)
+            future = pool.submit(
+                func, dataframe_type, cpu_count, dataset_size, **kwargs
+            )
             future = list(as_completed([future]))[0]
             try:
                 results.append(future.result())
             except BrokenProcessPool:
-                print(f"{dataframe_type} OOM killed. cpu_count={cpu_count} | dataset_size={dataset_size}")
+                print(
+                    f"{dataframe_type} OOM killed. cpu_count={cpu_count} | dataset_size={dataset_size}"
+                )
                 return []
-                
-
 
     return results

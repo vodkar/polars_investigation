@@ -16,12 +16,14 @@ class DaskDataFrameOperations(BaseDataFrameOperations[Any]):
     @contextmanager
     def setup(cls, cpu_count: int) -> Generator[Self, None, None]:
         with dask.config.set(
-            {"distributed.worker.daemon": False, "dataframe.convert-string": False}
+            {
+                "distributed.worker.daemon": False,
+                "dataframe.convert-string": False,
+            }
         ):
             with LocalCluster(
-                threads_per_worker=cpu_count,
-                n_workers=1,
-                processes=False,
+                threads_per_worker=1,
+                n_workers=cpu_count,
             ) as _:
                 yield cls()
 
@@ -49,11 +51,10 @@ class DaskDataFrameOperations(BaseDataFrameOperations[Any]):
                 aid_max=pd.NamedAgg(column="aid", aggfunc="max"),
             )
             .reset_index()
-            .compute()
         )
 
     def is_in(self, train_df: Any) -> pd.DataFrame:
-        return train_df[train_df["type"].isin({1, 2})].compute()
+        return train_df[train_df["type"].isin({1, 2})]
 
     def join(self, dataframes: DataFrames[Any]) -> pd.DataFrame:
         train_data, users_session_data, users_data = dataframes
@@ -63,17 +64,16 @@ class DaskDataFrameOperations(BaseDataFrameOperations[Any]):
             ).drop(columns="session_id")
             # .merge(users_data, left_on="user_id", right_on="id")
             # .drop(columns="id")
-            .compute()
         )
 
     def read_parquet(self, parquet: Path) -> pd.DataFrame:
-        return dd.read_parquet(parquet).compute()
+        return dd.read_parquet(parquet)
 
     def prepare_datasets(self, dataset_path: Path) -> DataFrames[pd.DataFrame]:
         return (
-            dd.read_parquet(dataset_path / TRAIN_PARQUET_NAME).compute(),
-            dd.read_parquet(USERS_SESSION_PARQUET).compute(),
-            dd.read_parquet(dataset_path / USERS_PARQUET).compute(),
+            dd.read_parquet(dataset_path / TRAIN_PARQUET_NAME),
+            dd.read_parquet(USERS_SESSION_PARQUET),
+            dd.read_parquet(dataset_path / USERS_PARQUET),
         )
 
     @staticmethod

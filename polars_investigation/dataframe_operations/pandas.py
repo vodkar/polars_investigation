@@ -24,9 +24,9 @@ class PandasDataFrameOperations(BaseDataFrameOperations[pd.DataFrame]):
             & users_df["address"].str.contains("Box")
             & (users_df["balance"] > 10000)
             & (users_df["cards"].str.len() >= 3)
-            & users_df["cards"].apply(
-                lambda cards: any(card["provider"] == "Mastercard" for card in cards)
-            )
+            # & users_df["cards"].apply(
+            #     lambda cards: any(card["provider"] == "Mastercard" for card in cards)
+            # )
         ]
 
     def group(self, train_df: pd.DataFrame) -> pd.DataFrame:

@@ -18,7 +18,7 @@ class DuckDBDataFrameOperations(BaseDataFrameOperations[duckdb.DuckDBPyRelation]
     @contextmanager
     def setup(cls, cpu_count: int) -> Generator[Self, None, None]:
         con = duckdb.connect(database=":memory:")
-        con.sql(f"SET threads TO {cpu_count};")
+        con.sql(f"SET threads TO {cpu_count}; SET enable_progress_bar = false;")
         # Warming up
         con.read_parquet("datasets/users.parquet").execute()
 
@@ -27,9 +27,13 @@ class DuckDBDataFrameOperations(BaseDataFrameOperations[duckdb.DuckDBPyRelation]
         con.close()
 
     def filter(self, users_df: duckdb.DuckDBPyRelation) -> duckdb.DuckDBPyRelation:
-        return users_df.filter(
-            "is_deleted = false AND address LIKE '%Box%' AND balance > 10000 AND len(cards) >= 3"
-        ).execute()
+        return (
+            users_df.filter(
+                "is_deleted = false AND address LIKE '%Box%' AND balance > 10000 AND len(cards) >= 3"
+            )
+            .count("*")
+            .execute()
+        )
 
     def group(self, train_df: duckdb.DuckDBPyRelation) -> duckdb.DuckDBPyRelation:
         return train_df.aggregate(
@@ -61,18 +65,16 @@ class DuckDBDataFrameOperations(BaseDataFrameOperations[duckdb.DuckDBPyRelation]
             .select(*columns_to_select).execute()
         )
 
-    def read_parquet(self, parquet: Path) -> list[Any]:
+    def read_parquet(self, parquet: Path) -> Any:
         return self.connection.read_parquet(str(parquet)).execute()
 
     def prepare_datasets(
         self, dataset_path: Path
     ) -> DataFrames[duckdb.DuckDBPyRelation]:
         return (
-            self.connection.read_parquet(
-                str(dataset_path / TRAIN_PARQUET_NAME)
-            ).execute(),
-            self.connection.read_parquet(str(USERS_SESSION_PARQUET)).execute(),
-            self.connection.read_parquet(str(dataset_path / USERS_PARQUET)).execute(),
+            self.connection.read_parquet(str(dataset_path / TRAIN_PARQUET_NAME)),
+            self.connection.read_parquet(str(USERS_SESSION_PARQUET)),
+            self.connection.read_parquet(str(dataset_path / USERS_PARQUET)),
         )
 
     @staticmethod

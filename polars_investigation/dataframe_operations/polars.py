@@ -22,42 +22,38 @@ class PolarsDataFrameOperations(BaseDataFrameOperations[pl.DataFrame]):
 
         yield cls(pl)
 
-    def filter(self, users_df: pl.LazyFrame) -> pl.DataFrame:
+    def filter(self, users_df: pl.DataFrame) -> pl.DataFrame:
         return users_df.filter(
             self.pl.col("is_deleted").not_()
             & self.pl.col("address").str.contains("Box")
             & (self.pl.col("balance") > 10000)
             & (self.pl.col("cards").list.len() >= 3)
-            & (
-                self.pl.col("cards")
-                .list.eval(self.pl.element().struct.field("provider") == "Mastercard")
-                .list.any()
-            ),
-        ).collect()
-
-    def group(self, train_df: pl.LazyFrame) -> pl.DataFrame:
-        return (
-            train_df.groupby("session")
-            .agg(
-                [
-                    pl.col("ts").first().alias("ts_first"),
-                    pl.col("aid").mean().alias("aid_mean"),
-                    pl.col("aid").sum().alias("aid_sum"),
-                    pl.col("aid").count().alias("aid_count"),
-                    pl.col("aid").median().alias("aid_median"),
-                    pl.col("aid").min().alias("aid_min"),
-                    pl.col("aid").max().alias("aid_max"),
-                ]
-            )
-            .collect()
+            # & (
+            #     self.pl.col("cards")
+            #     .list.eval(self.pl.element().struct.field("provider") == "Mastercard")
+            #     .list.any()
+            # ),
         )
 
-    def is_in(self, train_df: pl.LazyFrame) -> pl.DataFrame:
+    def group(self, train_df: pl.DataFrame) -> pl.DataFrame:
+        return train_df.groupby("session").agg(
+            [
+                pl.col("ts").first().alias("ts_first"),
+                pl.col("aid").mean().alias("aid_mean"),
+                pl.col("aid").sum().alias("aid_sum"),
+                pl.col("aid").count().alias("aid_count"),
+                pl.col("aid").median().alias("aid_median"),
+                pl.col("aid").min().alias("aid_min"),
+                pl.col("aid").max().alias("aid_max"),
+            ]
+        )
+
+    def is_in(self, train_df: pl.DataFrame) -> pl.DataFrame:
         return train_df.filter(
             self.pl.col("type").is_in({1, 2}),
-        ).collect()
+        )
 
-    def join(self, dataframes: DataFrames[pl.LazyFrame]) -> pl.DataFrame:
+    def join(self, dataframes: DataFrames[pl.DataFrame]) -> pl.DataFrame:
         train_data, users_session_data, users_data = dataframes
         return (
             train_data.join(
@@ -67,17 +63,16 @@ class PolarsDataFrameOperations(BaseDataFrameOperations[pl.DataFrame]):
                 how="left",
             )
             # .join(users_data, left_on="user_id", right_on="id")
-            .collect()
         )
 
     def read_parquet(self, parquet: Path) -> pl.DataFrame:
         return self.pl.read_parquet(parquet)
 
-    def prepare_datasets(self, dataset_path: Path) -> DataFrames[pl.LazyFrame]:
+    def prepare_datasets(self, dataset_path: Path) -> DataFrames[pl.DataFrame]:
         return (
-            pl.scan_parquet(dataset_path / TRAIN_PARQUET_NAME),
-            pl.scan_parquet(USERS_SESSION_PARQUET),
-            pl.scan_parquet(dataset_path / USERS_PARQUET),
+            pl.read_parquet(dataset_path / TRAIN_PARQUET_NAME),
+            pl.read_parquet(USERS_SESSION_PARQUET),
+            pl.read_parquet(dataset_path / USERS_PARQUET),
         )
 
     @staticmethod
