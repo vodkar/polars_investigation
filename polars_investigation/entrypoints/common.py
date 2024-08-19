@@ -16,7 +16,6 @@ from paths import DATASET_SIZES
 
 OPERATION_TYPES = [
     PandasDataFrameOperations,
-    DaskDataFrameOperations,
     PolarsDataFrameOperations,
     DuckDBDataFrameOperations,
     ModinDataFrameOperations,

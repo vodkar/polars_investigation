@@ -5,7 +5,7 @@ from typing import Any, Generator, Self
 import dask.config
 import dask.dataframe as dd
 import pandas as pd
-from dask.distributed import LocalCluster
+from dask.distributed import Client
 from dataframe_operations.base import BaseDataFrameOperations, DataFrames
 from paths import TRAIN_PARQUET_NAME, USERS_PARQUET, USERS_SESSION_PARQUET
 
@@ -21,10 +21,7 @@ class DaskDataFrameOperations(BaseDataFrameOperations[Any]):
                 "dataframe.convert-string": False,
             }
         ):
-            with LocalCluster(
-                threads_per_worker=1,
-                n_workers=cpu_count,
-            ) as _:
+            with Client(n_workers=1, threads_per_worker=cpu_count) as _:
                 yield cls()
 
     def filter(self, users_df: Any) -> Any:
@@ -36,7 +33,7 @@ class DaskDataFrameOperations(BaseDataFrameOperations[Any]):
             # & users_df["cards"].apply(
             #     lambda cards: any(card["provider"] == "Mastercard" for card in cards)
             # )
-        ]
+        ].compute()
 
     def group(self, train_df: Any) -> pd.DataFrame:
         return (
