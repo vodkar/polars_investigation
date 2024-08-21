@@ -31,7 +31,6 @@ class DuckDBDataFrameOperations(BaseDataFrameOperations[duckdb.DuckDBPyRelation]
             users_df.filter(
                 "is_deleted = false AND address LIKE '%Box%' AND balance > 10000 AND len(cards) >= 3"
             )
-            .count("*")
             .execute()
         )
 
@@ -50,7 +49,6 @@ class DuckDBDataFrameOperations(BaseDataFrameOperations[duckdb.DuckDBPyRelation]
         train_data, users_session_data, users_data = dataframes
         train_data = train_data.set_alias("train_data")
         users_session_data = users_session_data.set_alias("users_session_data")
-        # users_data = users_data.set_alias("users_data")
         columns_to_select = set([*train_data.columns, *users_session_data.columns]) - {
             "session_id",
             "id",
@@ -61,7 +59,6 @@ class DuckDBDataFrameOperations(BaseDataFrameOperations[duckdb.DuckDBPyRelation]
                 "train_data.session = users_session_data.session_id",
                 how="left",
             )
-            # .join(users_data, "users_session_data.user_id = users_data.id")
             .select(*columns_to_select).execute()
         )
 

@@ -62,7 +62,6 @@ class PolarsDataFrameOperations(BaseDataFrameOperations[pl.DataFrame]):
                 right_on="session_id",
                 how="left",
             )
-            # .join(users_data, left_on="user_id", right_on="id")
         )
 
     def read_parquet(self, parquet: Path) -> pl.DataFrame:

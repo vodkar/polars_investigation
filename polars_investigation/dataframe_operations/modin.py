@@ -45,7 +45,7 @@ class ModinDataFrameOperations(BaseDataFrameOperations[pd.DataFrame]):
             # & users_df["cards"].apply(
             #     lambda cards: any(card["provider"] == "Mastercard" for card in cards)
             # )
-        ).count()
+        )
         return df
 
     def group(self, train_df: pd.DataFrame) -> pd.DataFrame:
@@ -61,7 +61,6 @@ class ModinDataFrameOperations(BaseDataFrameOperations[pd.DataFrame]):
 
     def is_in(self, train_df: Any) -> pd.DataFrame:
         df = train_df[train_df["type"].isin({1, 2})]
-        df.count()
         return df
 
     def join(self, dataframes: DataFrames[pd.DataFrame]) -> pd.DataFrame:
@@ -70,10 +69,7 @@ class ModinDataFrameOperations(BaseDataFrameOperations[pd.DataFrame]):
             train_data.merge(
                 users_session_data, left_on="session", right_on="session_id", how="left"
             ).drop(columns="session_id")
-            # .merge(users_data, left_on="user_id", right_on="id")
-            # .drop(columns="id")
         )
-        print(df.count())
         return df
 
     def read_parquet(self, parquet: Path) -> pd.DataFrame:

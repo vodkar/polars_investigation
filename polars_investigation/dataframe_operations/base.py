@@ -2,6 +2,7 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 from concurrent.futures.process import BrokenProcessPool
 import json
 import os
+import gc
 import subprocess
 from abc import ABC, abstractmethod
 from functools import partial
@@ -14,7 +15,7 @@ import pandas as pd
 from memory import memory_consumption_in_bytes
 from paths import DATASETS_PATH, MEMRAY_TRACK_FILE, TRAIN_PARQUET_NAME
 from pydantic import BaseModel
-
+from filprofiler.api import profile
 
 class BenchmarkResult(BaseModel):
     name: str
@@ -114,9 +115,13 @@ def benchmark(
     dataset_size: str,
     spark_get_memory: Optional[Callable[..., int]] = None,
 ) -> BenchmarkResult:
+    gc.collect()
     memory_before = memory_consumption_in_bytes()
     start = monotonic()
-    func()
+    if os.environ.get("FIL_PROFILE"):
+        profile(func(), "/tmp/fil-result")
+    else:
+        func()
     duration = monotonic() - start
     if "modin" in tool:
         memray_result_json = MEMRAY_TRACK_FILE.with_suffix(".json")
@@ -172,10 +177,6 @@ def repeatably_run_in_process(
 ) -> list[BenchmarkResult]:
     results: list[BenchmarkResult] = []
     for pass_number in range(repeat):
-        # print(
-        #     f"Runs {pass_number + 1}/{repeat} pass with {dataframe_type} benchmark. cpu_count={cpu_count} | dataset_size={dataset_size}"
-        # )
-        # results.append(func(dataframe_type, cpu_count, dataset_size))
         ctx = get_context("spawn")
         with ProcessPoolExecutor(1, ctx) as pool:
             print(

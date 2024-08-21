@@ -24,9 +24,6 @@ class PandasDataFrameOperations(BaseDataFrameOperations[pd.DataFrame]):
             & users_df["address"].str.contains("Box")
             & (users_df["balance"] > 10000)
             & (users_df["cards"].str.len() >= 3)
-            # & users_df["cards"].apply(
-            #     lambda cards: any(card["provider"] == "Mastercard" for card in cards)
-            # )
         ]
 
     def group(self, train_df: pd.DataFrame) -> pd.DataFrame:
@@ -49,8 +46,6 @@ class PandasDataFrameOperations(BaseDataFrameOperations[pd.DataFrame]):
             train_data.merge(
                 users_session_data, left_on="session", right_on="session_id", how="left"
             ).drop(columns="session_id")
-            # .merge(users_data, left_on="user_id", right_on="id")
-            # .drop(columns="id")
         )
 
     def read_parquet(self, parquet: Path) -> pd.DataFrame:

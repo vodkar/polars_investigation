@@ -44,7 +44,7 @@ class PysparkDataFrameOperations(BaseDataFrameOperations[DataFrame]):
             # & f.expr("exists(cards, x -> x.provider == 'Mastercard')")
         )
         # Trigger the computation
-        df.count()
+        df.collect()
 
         self._update_memory_consumption(df)
 
@@ -60,7 +60,7 @@ class PysparkDataFrameOperations(BaseDataFrameOperations[DataFrame]):
             f.min("aid").alias("aid_min"),
             f.max("aid").alias("aid_max"),
         )
-        df.count()
+        df.collect()
 
         self._update_memory_consumption(df)
 
@@ -68,7 +68,7 @@ class PysparkDataFrameOperations(BaseDataFrameOperations[DataFrame]):
 
     def is_in(self, train_df: DataFrame) -> DataFrame:
         result = train_df[train_df["type"].isin({1, 2})]
-        result.count()
+        result.collect()
 
         self._update_memory_consumption(result)
 
@@ -82,10 +82,8 @@ class PysparkDataFrameOperations(BaseDataFrameOperations[DataFrame]):
                 train_data.session == users_session_data.session_id,
                 how="left",
             ).drop("session_id")
-            # .join(users_data, users_session_data.user_id == users_data.id)
-            # .drop("id")
         )
-        result.count()
+        result.collect()
 
         self._update_memory_consumption(result)
 
@@ -93,7 +91,7 @@ class PysparkDataFrameOperations(BaseDataFrameOperations[DataFrame]):
 
     def read_parquet(self, parquet: Path) -> pd.DataFrame:
         df = self.spark.read.parquet(str(parquet))
-        df.count()
+        df.collect()
         self._update_memory_consumption(df)
         return df
 
