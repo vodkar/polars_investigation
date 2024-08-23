@@ -60,7 +60,7 @@ class ModinDataFrameOperations(BaseDataFrameOperations[pd.DataFrame]):
         )
 
     def is_in(self, train_df: Any) -> pd.DataFrame:
-        df = train_df[train_df["type"].isin({1, 2})]
+        df = train_df.query("type in [1, 2]")
         return df
 
     def join(self, dataframes: DataFrames[pd.DataFrame]) -> pd.DataFrame:
