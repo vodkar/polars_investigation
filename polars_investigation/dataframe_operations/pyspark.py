@@ -60,7 +60,7 @@ class PysparkDataFrameOperations(BaseDataFrameOperations[DataFrame]):
             f.min("aid").alias("aid_min"),
             f.max("aid").alias("aid_max"),
         )
-        df.collect()
+        df.count()
 
         self._update_memory_consumption(df)
 
@@ -91,7 +91,7 @@ class PysparkDataFrameOperations(BaseDataFrameOperations[DataFrame]):
 
     def read_parquet(self, parquet: Path) -> pd.DataFrame:
         df = self.spark.read.parquet(str(parquet))
-        df.collect()
+        df.count()
         self._update_memory_consumption(df)
         return df
 
