@@ -40,13 +40,12 @@ class ModinDataFrameOperations(BaseDataFrameOperations[pd.DataFrame]):
         ray.shutdown()
 
     def filter(self, users_df: pd.DataFrame) -> Any:
-        df = users_df.query(
-            "not is_deleted & 'Box' in address & balance > 10000"
-            # & users_df["cards"].apply(
-            #     lambda cards: any(card["provider"] == "Mastercard" for card in cards)
-            # )
-        )
-        return df
+        return users_df[
+            ~users_df["is_deleted"]
+            & users_df["address"].str.contains("Box")
+            & (users_df["balance"] > 10000)
+            & (users_df["cards"].str.len() >= 3)
+        ].shape
 
     def group(self, train_df: pd.DataFrame) -> pd.DataFrame:
         return train_df.groupby("session", as_index=False).agg(
